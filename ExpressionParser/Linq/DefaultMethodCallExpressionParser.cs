@@ -11,9 +11,9 @@ namespace ExpressionParser.Linq
     {
         private readonly Dictionary<string, SqlOperationFormatter> sqlOperationMap = new Dictionary<string, SqlOperationFormatter>
         {
-            {"StartsWidth", new SqlOperationFormatter(Operation.Like, (s) =>s + " + \"%\"")},
-            {"Contains",    new SqlOperationFormatter(Operation.Like, (s) =>"\"%\" + " + s + " + \"%\"")},
-            {"EndsWith",    new SqlOperationFormatter(Operation.Like, (s) =>"\"%\" + " + s)},
+            {"StartsWith", new SqlOperationFormatter(Operation.Like, (s) =>s + " + '%'")},
+            {"Contains",    new SqlOperationFormatter(Operation.Like, (s) =>"'%' + " + s + " + '%'")},
+            {"EndsWith",    new SqlOperationFormatter(Operation.Like, (s) =>"'%' + " + s)},
         };
 
         private class SqlOperationFormatter
