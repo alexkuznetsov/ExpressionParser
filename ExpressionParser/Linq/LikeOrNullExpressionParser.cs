@@ -18,7 +18,7 @@ namespace ExpressionParser.Linq
         {
             var propertyAccess = (MemberAccessNode)GetParser(expression.Arguments[0]).Parse(queryMapping);
 
-            propertyAccess.Formatter = (s) => @$"""%"" + {s} + ""%""";
+            propertyAccess.Formatter = (s) => @$"'%' + {s} + '%'";
 
             var values = (ConstantNode)GetParser(expression.Arguments[1]).Parse(queryMapping);
             values.ForceParameter = true;

@@ -129,7 +129,7 @@ namespace ExpressionParser.Tests
             var node = parser.Parse(mapping);
             var result = Parser.CreateResult(node);
 
-            Assert.AreEqual(@"(((m.parent_id IS NOT NULL) AND (m.id >= @Id)) AND (m.parent_code LIKE ""%"" + @ParentCode))", result.ResultExpression);
+            Assert.AreEqual(@"(((m.parent_id IS NOT NULL) AND (m.id >= @Id)) AND (m.parent_code LIKE '%' + @ParentCode))", result.ResultExpression);
 
             var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
@@ -170,7 +170,7 @@ namespace ExpressionParser.Tests
             var node = parser.Parse(mapping);
             var result = Parser.CreateResult(node);
 
-            Assert.AreEqual(@"(((m.name LIKE ""%"" + @Name + ""%"") OR (@Name IS NULL)) AND ((m.id = @Id) OR (@Id IS NULL)))", result.ResultExpression);
+            Assert.AreEqual(@"(((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL)) AND ((m.id = @Id) OR (@Id IS NULL)))", result.ResultExpression);
 
             var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
@@ -210,7 +210,7 @@ namespace ExpressionParser.Tests
             var node = parser.Parse(mapping);
             var result = Parser.CreateResult(node);
 
-            Assert.AreEqual(@"(m.name LIKE ""%"" + @Name + ""%"")", result.ResultExpression);
+            Assert.AreEqual(@"(m.name LIKE '%' + @Name + '%')", result.ResultExpression);
 
             var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
@@ -229,7 +229,7 @@ namespace ExpressionParser.Tests
             var node = parser.Parse(mapping);
             var result = Parser.CreateResult(node);
 
-            Assert.AreEqual(@"((m.name LIKE ""%"" + @Name + ""%"") OR (@Name IS NULL))", result.ResultExpression);
+            Assert.AreEqual(@"((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL))", result.ResultExpression);
 
             var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
@@ -250,7 +250,7 @@ namespace ExpressionParser.Tests
 
             //SubModel.Name => s.name
 
-            Assert.AreEqual(@"(((m.name LIKE ""%"" + @Name + ""%"") OR (@Name IS NULL)) OR ((s.name LIKE ""%"" + @SubModelName + ""%"") OR (@SubModelName IS NULL)))", result.ResultExpression);
+            Assert.AreEqual(@"(((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL)) OR ((s.name LIKE '%' + @SubModelName + '%') OR (@SubModelName IS NULL)))", result.ResultExpression);
 
             var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
@@ -260,6 +260,49 @@ namespace ExpressionParser.Tests
 
             Assert.AreEqual(parametes["Name"], name);
             Assert.AreEqual(parametes["SubModelName"], name);
+        }
+
+        [Test]
+        public void GivenNameContainsOrNullэто_для_те_ResultIsValidWhereExpression()
+        {
+            var name = "это для те";
+            Expression<Func<TestModel, bool>> expression = s => s.Name.ContainsOrNull("это для те");
+            var parser = Parser.GetParser(expression);
+            var node = parser.Parse(mapping);
+            var result = Parser.CreateResult(node);
+
+            //SubModel.Name => s.name
+
+            Assert.AreEqual(@"((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL))", result.ResultExpression);
+
+            var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
+
+            Assert.IsTrue(parametes.Count == 1);
+            Assert.IsTrue(parametes.ContainsKey("Name"));
+
+            Assert.AreEqual(parametes["Name"], name);
+        }
+
+
+        [Test]
+        public void GivenNam_StartsWith_тип_ResultIsValidWhereExpression()
+        {
+            var name = "тип";
+            Expression<Func<TestModel, bool>> expression = s => s.Name.StartsWith(name);
+            var parser = Parser.GetParser(expression);
+            var node = parser.Parse(mapping);
+            var result = Parser.CreateResult(node);
+
+            //SubModel.Name => s.name
+
+            Assert.AreEqual(@"(m.name LIKE @Name + '%')", result.ResultExpression);
+
+            var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
+
+            Assert.IsTrue(parametes.Count == 1);
+            Assert.IsTrue(parametes.ContainsKey("Name"));
+
+            Assert.AreEqual(parametes["Name"], name);
         }
     }
 }
