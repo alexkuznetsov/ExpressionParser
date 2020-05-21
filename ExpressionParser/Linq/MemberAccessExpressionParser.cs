@@ -14,9 +14,27 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
+        //private Expression NodeInBottom()
+        //{
+        //    var e = expression.Expression;
+        //    while(e.NodeType != ExpressionType.Parameter || e!=null)
+        //    {
+        //        e = E
+        //    }
+
+        //    return e;
+        //}
+
         public override Node Parse(IQueryMapping queryMapping)
         {
-            if (expression.Expression != null && expression.Expression.NodeType != ExpressionType.Parameter)
+            var memberName = expression.GetPropertyName('.');
+            //if (expression.Expression.NodeType == ExpressionType.MemberAccess)
+            //{
+            //    var subNode = (MemberAccessNode)GetParser(expression.Expression).Parse(queryMapping);
+            //    memberName = subNode.MemberName + memberName;
+            //}
+
+            if (expression.Expression is ConstantExpression)
             {
                 if (expression.Expression.NodeType == ExpressionType.Constant)
                 {
@@ -29,10 +47,12 @@ namespace ExpressionParser.Linq
                 }
             }
 
-            if (!queryMapping.Mappings.TryGetValue(expression.Member.Name, out var replacement))
-                replacement = expression.Member.Name;
+            if (!queryMapping.Mappings.TryGetValue(memberName, out var replacement))
+                replacement = memberName;
 
-            return new MemberAccessNode(expression.Type, replacement, expression.Member.Name);
+            return new MemberAccessNode(expression.Type, replacement, memberName);
         }
+
+        
     }
 }

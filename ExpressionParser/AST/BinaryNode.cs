@@ -35,7 +35,7 @@ namespace ExpressionParser.AST
                 finalExpression.Append('(');
                 if (me.Identifier.StartsWith('@'))
                 {
-                    var parameterName = me.Identifier;
+                    var parameterName = me.Identifier.Replace(".", "");
                     var type = ce.ParameterType;
 
                     if (type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type)))
@@ -60,7 +60,7 @@ namespace ExpressionParser.AST
                     finalExpression.Append(Operation.AsString());
                     finalExpression.Append(' ');
 
-                    var parameterName = me.MemberName;
+                    var parameterName = me.MemberName.Replace(".", "");
                     var type = ce.ParameterType;
 
                     if (type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type)))
@@ -92,7 +92,7 @@ namespace ExpressionParser.AST
                 finalExpression.Append(Operation.AsString());
                 finalExpression.Append(' ');
 
-                var parameterName = methodCallNode.MemberName;
+                var parameterName = methodCallNode.MemberName.Replace(".", "");
                 var type = methodCallArg.ParameterType;
 
 

@@ -36,9 +36,6 @@ namespace ExpressionParser.Linq
                 isAr2ConstantStringConstant = cn.ParameterType == typeof(string);
             }
 
-
-
-
             if (isArg1ConstantExpression && isArg2MemberExpression)
             {
                 return ParseContainsInCollection(queryMapping);
@@ -62,7 +59,7 @@ namespace ExpressionParser.Linq
             memberAccessResult.Formatter = (s) => "\"%\" + " + s + " + \"%\"";
             valueSetResult.ForceParameter = true;
 
-            return new BinaryNode(Operation.OrElse) /* property in @collection or @collection is null */
+            return new BinaryNode(Operation.OrElse) /* property like @val or @val is null */
             {
                 LeftNode = new BinaryNode(Operation.Like)
                 {

@@ -24,12 +24,14 @@ namespace ExpressionParser
 
         protected void Map(Expression<Func<TModel, object>> propertyExpression, string sqlAccessExpression, string tableAliasOverride = default)
         {
-            AddMapping((propertyExpression.Body as MemberExpression).Member.Name, sqlAccessExpression, tableAliasOverride);
+            var name = propertyExpression.GetPropertyName();
+            AddMapping(name, sqlAccessExpression, tableAliasOverride);
         }
 
         protected void MapToSameWithUnderscores(Expression<Func<TModel, object>> propertyExpression, string tableAliasOverride = default)
         {
-            AddMapping((propertyExpression.Body as MemberExpression).Member.Name, tableAliasOverride);
+            var name = propertyExpression.GetPropertyName();
+            AddMapping(name, tableAliasOverride);
         }
 
         protected void AddMapping(string modelPropery, string tableAliasOverride = default)
