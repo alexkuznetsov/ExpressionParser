@@ -3,13 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace ExpressionParser.Parser
+namespace ExpressionParser
 {
-    public interface IQueryMapping
-    {
-        IReadOnlyDictionary<string, string> Mappings { get; }
-    }
-
     public class QueryMapping<TModel> : IQueryMapping
     {
         private readonly Dictionary<string, string> Mapping = new Dictionary<string, string>();

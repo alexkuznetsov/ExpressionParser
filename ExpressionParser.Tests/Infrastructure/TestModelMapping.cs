@@ -1,7 +1,7 @@
 ﻿
 using Domain;
 
-using ExpressionParser.Parser;
+using ExpressionParser;
 
 namespace Infrastructure
 {
