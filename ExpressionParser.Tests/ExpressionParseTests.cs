@@ -69,9 +69,6 @@ namespace ExpressionParser.Tests
         [Test]
         public void GivenCodeNotEquealsCODEXX1_ResultNotEqualsTranslatedSuccess()
         {
-
-
-
             Expression<Func<TestModel, bool>> expression = s => s.Code != "CODEXX1";
             var parser = Parser.GetParser(expression);
             var node = parser.Parse(mapping);
@@ -222,6 +219,7 @@ namespace ExpressionParser.Tests
 
             Assert.AreEqual(parametes["Name"], name);
         }
+
         [Test]
         public void GivenStringForName_ResultIsNameLikeParamOrParamIsNull()
         {
@@ -239,6 +237,29 @@ namespace ExpressionParser.Tests
             Assert.IsTrue(parametes.ContainsKey("Name"));
 
             Assert.AreEqual(parametes["Name"], name);
+        }
+
+        [Test]
+        public void GivenNameForSubmodel_ResultIsSubModelNameLikeParamOrParamIsNull()
+        {
+            var name = "";
+            Expression<Func<TestModel, bool>> expression = s => s.Name.ContainsOrNull(name) || s.SubModel.Name.ContainsOrNull(name);
+            var parser = Parser.GetParser(expression);
+            var node = parser.Parse(mapping);
+            var result = Parser.CreateResult(node);
+
+            //SubModel.Name => s.name
+
+            Assert.AreEqual(@"(((m.name LIKE ""%"" + @Name + ""%"") OR (@Name IS NULL)) OR ((s.name LIKE ""%"" + @SubModelName + ""%"") OR (@SubModelName IS NULL)))", result.ResultExpression);
+
+            var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
+
+            Assert.IsTrue(parametes.Count == 2);
+            Assert.IsTrue(parametes.ContainsKey("Name"));
+            Assert.IsTrue(parametes.ContainsKey("SubModelName"));
+
+            Assert.AreEqual(parametes["Name"], name);
+            Assert.AreEqual(parametes["SubModelName"], name);
         }
     }
 }
