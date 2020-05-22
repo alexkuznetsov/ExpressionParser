@@ -304,5 +304,65 @@ namespace ExpressionParser.Tests
 
             Assert.AreEqual(parametes["Name"], name);
         }
+
+        [Test]
+        public void GivenGetOrganizationSpecification_ResultIsValidWhereExpression()
+        {
+            var query = new TestQueryModel();
+            var idCollection = new[] { 1167, 1216 };
+            var spec = new GetTestModelSpecification(query, idCollection);
+            var parser = Parser.GetParser(spec.Expression);
+            var node = parser.Parse(mapping);
+            var result = Parser.CreateResult(node);
+
+            //SubModel.Name => s.name
+
+            Assert.AreEqual(@"((((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL)) AND ((m.parent_id = @ParentId) OR (@ParentId IS NULL))) AND ((m.id IN @IdCollection) OR (@IdCollection IS NULL)))", result.ResultExpression);
+
+            var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
+
+            Assert.IsTrue(parametes.Count == 3);
+            Assert.IsTrue(parametes.ContainsKey("Name"));
+            Assert.IsTrue(parametes.ContainsKey("ParentId"));
+            Assert.IsTrue(parametes.ContainsKey("IdCollection"));
+
+            Assert.AreEqual(parametes["Name"], query.Name, "Параметр Name не соответсвует значениею query.Name");
+            Assert.AreEqual(parametes["ParentId"], query.ParentId);
+            Assert.AreEqual(parametes["IdCollection"], idCollection);
+        }
+    }
+
+    class TestQueryModel
+    {
+        public string Name { get; set; }
+
+        public int? ParentId { get; set; }
+
+        public TestQueryModel()
+        {
+
+        }
+    }
+
+    class GetTestModelSpecification
+    {
+        public GetTestModelSpecification(
+               TestQueryModel query
+            , int[] filterByIds)
+            : this(x => x.Name.LikeOrNull(query.Name)
+            && x.ParentId.EqualsOrNull(query.ParentId)
+            && filterByIds.ContainsOrNull(x.Id))
+        {
+            /*
+             * (((x.name LIKE @Name) OR (@Name IS NULL)) AND ((x.parent_id = @ParentId) OR (@ParentId IS NULL)) AND (x.Id IN @IdCollection) OR (@IdCollection IS NULL)))
+             */
+        }
+
+        public GetTestModelSpecification(Expression<Func<Domain.TestModel, bool>> expression)
+        {
+            Expression = expression;
+        }
+
+        public Expression<Func<Domain.TestModel, bool>> Expression { get; set; }
     }
 }
