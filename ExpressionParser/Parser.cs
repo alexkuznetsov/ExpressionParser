@@ -38,15 +38,15 @@ namespace ExpressionParser
             }
         }
 
-        public static NodeExpression CreateResult(Node node)
+        public static NodeExpression CreateResult(Node node, IQueryMapping mapping)
         {
             var finalExpression = new NodeExpression();
-            node.Visit(finalExpression);
+            node.Visit(finalExpression, mapping);
 
             return finalExpression;
         }
 
-        public abstract Node Parse(IQueryMapping queryMapping);
+        public abstract Node Parse();
 
         protected Operation ParseOperation(ExpressionType expressionType)
         {

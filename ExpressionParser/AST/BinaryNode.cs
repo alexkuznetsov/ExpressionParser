@@ -18,35 +18,47 @@ namespace ExpressionParser.AST
         public Operation Operation { get; }
 
         [Obsolete("Выделить визиторы")]
-        public override void Visit(NodeExpression finalExpression)
+        public override void Visit(NodeExpression finalExpression, IQueryMapping mapping)
         {
             if (LeftNode is BinaryNode)
             {
                 finalExpression.Append('(');
-                LeftNode.Visit(finalExpression);
+                LeftNode.Visit(finalExpression, mapping);
                 finalExpression.Append(' ');
                 finalExpression.Append(Operation.AsString());
                 finalExpression.Append(' ');
-                RightNode.Visit(finalExpression);
+                RightNode.Visit(finalExpression, mapping);
                 finalExpression.Append(')');
             }
             else if (LeftNode is MemberAccessNode me && RightNode is ConstantNode ce)
             {
                 finalExpression.Append('(');
-                if (me.Identifier.StartsWith('@'))
+
+                var memberName = me.Parent != null ? $"{me.Parent.MemberName}.{me.MemberName}" : me.MemberName;
+
+                if (me.MemberName.StartsWith('@'))
                 {
-                    var parameterName = me.Identifier.Replace(".", "");
+                    var parameterName = (me.Parent != null ? $"{me.Parent.MemberName}{me.MemberName}" : me.MemberName)
+                        .Replace(".", "")
+                        .Replace("@", "");
+
                     var type = ce.ParameterType;
 
                     if (type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type)))
                     {
                         parameterName += "Collection";
                     }
+                    finalExpression.Append('@');
                     finalExpression.Append(parameterName);
                 }
                 else
                 {
-                    finalExpression.Append(me.Identifier);
+                    if (!mapping.Mappings.TryGetValue(memberName, out var identifier))
+                    {
+                        identifier = memberName;
+                    }
+
+                    finalExpression.Append(identifier);
                 }
 
                 if (ce.Value is null && !ce.ForceParameter)
@@ -60,7 +72,7 @@ namespace ExpressionParser.AST
                     finalExpression.Append(Operation.AsString());
                     finalExpression.Append(' ');
 
-                    var parameterName = me.MemberName.Replace(".", "");
+                    var parameterName = memberName.Replace(".", "");
                     var type = ce.ParameterType;
 
                     if (type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type)))
@@ -77,16 +89,18 @@ namespace ExpressionParser.AST
                         finalExpression.Append($"@{parameterName}");
                     }
                     finalExpression.Parameters.Add(new NodeParameter(parameterName, ce.Value));
-
-                    //finalExpression.Append($"@{me.MemberName}");
-                    //finalExpression.Parameters.Add(new Filter(me.MemberName, ce.Value));
                 }
                 finalExpression.Append(')');
             }
             else if (LeftNode is MethodCallNode methodCallNode && RightNode is ConstantNode methodCallArg)
             {
+                if (!mapping.Mappings.TryGetValue(methodCallNode.MemberName, out var identifier))
+                {
+                    identifier = methodCallNode.MemberName;
+                }
+
                 finalExpression.Append('(');
-                finalExpression.Append(methodCallNode.Identifier);
+                finalExpression.Append(identifier);
 
                 finalExpression.Append(' ');
                 finalExpression.Append(Operation.AsString());

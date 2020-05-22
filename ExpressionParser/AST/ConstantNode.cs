@@ -16,7 +16,7 @@ namespace ExpressionParser.AST
             Value = value;
         }
 
-        public override void Visit(NodeExpression finalExpression) => throw new InvalidOperationException();
+        public override void Visit(NodeExpression finalExpression, IQueryMapping mapping) => throw new InvalidOperationException();
     }
 
 
