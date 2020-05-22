@@ -4,6 +4,14 @@ using ExpressionParser.AST.Enum;
 
 namespace ExpressionParser.AST
 {
+    public class EmptyNode : Node
+    {
+        public override void Visit(NodeExpression finalExpression, IQueryMapping mapping)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class BinaryNode : Node
     {
         public BinaryNode(Operation operation)
@@ -118,6 +126,16 @@ namespace ExpressionParser.AST
                 finalExpression.Append(methodCallNode.Formatter($"@{parameterName}"));
 
                 finalExpression.Parameters.Add(new NodeParameter(parameterName, methodCallArg.Value));
+                finalExpression.Append(')');
+            }
+            else if (LeftNode is ConstantNode c1 && RightNode is ConstantNode c2)
+            {
+                finalExpression.Append('(');
+                finalExpression.Append(c1.Value);
+                finalExpression.Append(' ');
+                finalExpression.Append(Operation.AsString());
+                finalExpression.Append(' ');
+                finalExpression.Append(c2.Value);
                 finalExpression.Append(')');
             }
             else

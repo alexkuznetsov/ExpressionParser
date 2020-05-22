@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 using System.Linq.Expressions;
 
 using ExpressionParser.AST;
@@ -70,18 +72,21 @@ namespace ExpressionParser.Linq
             //var valueSetResult = (ConstantNode)valuesSet.Parse(queryMapping);
             //var memberAccessResult = (MemberAccessNode)memberAccess.Parse(queryMapping);
 
-            return new BinaryNode(Operation.OrElse) /* property in @collection or @collection is null */
+            if ((valNode.Value == null)
+                ||
+                (valNode.Value is IEnumerable e && (e.Cast<object>().Any() == false)))
             {
-                LeftNode = new BinaryNode(Operation.In)
+                return new BinaryNode(Operation.Equal)
                 {
-                    LeftNode = memberNode,
-                    RightNode = valNode
-                },
-                RightNode = new BinaryNode(Operation.Equal)
-                {
-                    LeftNode = new MemberAccessNode(valNode.ParameterType, $"@{memberNode.MemberName}", memberNode.Parent),
-                    RightNode = new ConstantNode(valNode.ParameterType, null)
-                }
+                    LeftNode = new ConstantNode(valNode.ParameterType, 1),
+                    RightNode = new ConstantNode(valNode.ParameterType, 1)
+                };
+            }
+            
+            return new BinaryNode(Operation.In)
+            {
+                LeftNode = memberNode,
+                RightNode = valNode
             };
         }
     }

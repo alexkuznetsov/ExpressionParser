@@ -191,7 +191,7 @@ namespace ExpressionParser.Tests
             var node = parser.Parse();
             var result = Parser.CreateResult(node, mapping);
 
-            Assert.AreEqual(@"((m.id IN @IdCollection) OR (@IdCollection IS NULL))", result.ResultExpression);
+            Assert.AreEqual(@"(m.id IN @IdCollection)", result.ResultExpression);
 
             var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
@@ -199,6 +199,38 @@ namespace ExpressionParser.Tests
             Assert.IsTrue(parametes.ContainsKey("IdCollection"));
 
             Assert.AreEqual(parametes["IdCollection"], idCollection);
+        }
+
+        [Test]
+        public void GivenIdRangeIsEmpty_ResultIsOneEqualsOneExpression()
+        {
+            var idCollection = new int[] { };
+            Expression<Func<TestModel, bool>> expression = s => idCollection.ContainsOrNull(s.Id);
+            var parser = Parser.GetParser(expression);
+            var node = parser.Parse();
+            var result = Parser.CreateResult(node, mapping);
+
+            Assert.AreEqual(@"(1 = 1)", result.ResultExpression);
+
+            var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
+
+            Assert.IsTrue(parametes.Count == 0);
+        }
+
+        [Test]
+        public void GivenIdRangeIsNull_ResultIsOneEqualsOneExpression()
+        {
+            int[] idCollection = null;
+            Expression<Func<TestModel, bool>> expression = s => idCollection.ContainsOrNull(s.Id);
+            var parser = Parser.GetParser(expression);
+            var node = parser.Parse();
+            var result = Parser.CreateResult(node, mapping);
+
+            Assert.AreEqual(@"(1 = 1)", result.ResultExpression);
+
+            var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
+
+            Assert.IsTrue(parametes.Count == 0);
         }
 
         [Test]
@@ -338,7 +370,7 @@ namespace ExpressionParser.Tests
 
             //SubModel.Name => s.name
 
-            Assert.AreEqual(@"((((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL)) AND ((m.parent_id = @ParentId) OR (@ParentId IS NULL))) AND ((m.id IN @IdCollection) OR (@IdCollection IS NULL)))", result.ResultExpression);
+            Assert.AreEqual(@"((((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL)) AND ((m.parent_id = @ParentId) OR (@ParentId IS NULL))) AND (m.id IN @IdCollection))", result.ResultExpression);
 
             var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
@@ -350,6 +382,30 @@ namespace ExpressionParser.Tests
             Assert.AreEqual(parametes["Name"], query.Name, "Параметр Name не соответсвует значениею query.Name");
             Assert.AreEqual(parametes["ParentId"], query.ParentId);
             Assert.AreEqual(parametes["IdCollection"], idCollection);
+        }
+
+        [Test]
+        public void GivenGetOrganizationSpecification2_ResultIsValidWhereExpression()
+        {
+            var query = new TestQueryModel();
+            var idCollection = new int[] { };
+            var spec = new GetTestModelSpecification(query, idCollection);
+            var parser = Parser.GetParser(spec.Expression);
+            var node = parser.Parse();
+            var result = Parser.CreateResult(node, mapping);
+
+            //SubModel.Name => s.name
+
+            Assert.AreEqual(@"((((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL)) AND ((m.parent_id = @ParentId) OR (@ParentId IS NULL))) AND (1 = 1))", result.ResultExpression);
+
+            var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
+
+            Assert.IsTrue(parametes.Count == 2);
+            Assert.IsTrue(parametes.ContainsKey("Name"));
+            Assert.IsTrue(parametes.ContainsKey("ParentId"));
+
+            Assert.AreEqual(parametes["Name"], query.Name, "Параметр Name не соответсвует значениею query.Name");
+            Assert.AreEqual(parametes["ParentId"], query.ParentId);
         }
     }
 
