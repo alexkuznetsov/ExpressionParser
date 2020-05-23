@@ -1,0 +1,24 @@
+<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">
+  <UsingTask TaskName="SetupEnv" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <EnvVariable ParameterType="System.String" Required="true"/>
+      <Value ParameterType="System.String" Output="true"/>
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System"/>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+Value = Environment.GetEnvironmentVariable(EnvVariable);
+]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="SetupEnv" BeforeTargets="CopyPackage">
+    <SetupEnv EnvVariable="ProgramFiles(x86)">
+      <Output PropertyName="ProgramFilesX86" TaskParameter="Value" />
+    </SetupEnv>
+    <Message Text="Imported ENV(ProgramFiles(x86)) is:  $(ProgramFilesX86)" Importance="High" />
+  </Target>
+
+</Project>
