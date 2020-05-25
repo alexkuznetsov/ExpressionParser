@@ -22,8 +22,6 @@ namespace ExpressionParser.AST
             MemberName = memberName;
             Parent = parent;
         }
-
-        public override void Visit(NodeExpression finalExpression, IQueryMapping mapping) => throw new InvalidOperationException();
     }
 
 

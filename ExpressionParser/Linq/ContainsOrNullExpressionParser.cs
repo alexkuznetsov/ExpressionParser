@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 
 using ExpressionParser.AST;
-using ExpressionParser.AST.Enum;
 
 namespace ExpressionParser.Linq
 {
@@ -38,12 +37,6 @@ namespace ExpressionParser.Linq
               MemberAccessNode memberNode
             , ConstantNode valNode)
         {
-            //var a1 = GetParser(expression.Arguments[0]);
-            //var a2 = GetParser(expression.Arguments[1]);
-
-            //var memberAccessResult = (MemberAccessNode)a1.Parse(queryMapping);
-            //var valueSetResult = (ConstantNode)a2.Parse(queryMapping);
-
             memberNode.Formatter = (s) => "'%' + " + s + " + '%'";
             valNode.ForceParameter = true;
 
@@ -66,12 +59,6 @@ namespace ExpressionParser.Linq
               ConstantNode valNode
             , MemberAccessNode memberNode)
         {
-            //var valuesSet = GetParser(expression.Arguments[0]);
-            //var memberAccess = GetParser(expression.Arguments[1]);
-
-            //var valueSetResult = (ConstantNode)valuesSet.Parse(queryMapping);
-            //var memberAccessResult = (MemberAccessNode)memberAccess.Parse(queryMapping);
-
             if ((valNode.Value == null)
                 ||
                 (valNode.Value is IEnumerable e && (e.Cast<object>().Any() == false)))

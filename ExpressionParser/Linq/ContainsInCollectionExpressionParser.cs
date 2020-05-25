@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 
 using ExpressionParser.AST;
-using ExpressionParser.AST.Enum;
 
 namespace ExpressionParser.Linq
 {
