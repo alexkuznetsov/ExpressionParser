@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 using ExpressionParser.AST;
-using ExpressionParser.AST.Enum;
 
 namespace ExpressionParser.Linq
 {
@@ -35,7 +34,7 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
+        public override Node Parse()
         {
             var testObject = expression.Object as MemberExpression;
 
@@ -44,20 +43,15 @@ namespace ExpressionParser.Linq
                 throw new NotSupportedException($"Method {expression.Method} not supported");
             }
 
-            if (!queryMapping.Mappings.TryGetValue(testObject.Member.Name, out var leftNodeIdentifier))
-                leftNodeIdentifier = testObject.Member.Name;
-
-
             return new BinaryNode(formatter.Operation)
             {
                 LeftNode = new MethodCallNode
                 {
-                    Identifier = leftNodeIdentifier,
                     MemberName = testObject.Member.Name,
                     Formatter = formatter.Formatter
                 },
 
-                RightNode = GetParser(expression.Arguments[0]).Parse(queryMapping)
+                RightNode = GetParser(expression.Arguments[0]).Parse()
             };
         }
     }

@@ -22,5 +22,7 @@ namespace ExpressionParser
         public void Append(char data) => buffer.Append(data);
         [DebuggerStepThrough]
         public void Append(string data) => buffer.Append(data);
+        [DebuggerStepThrough]
+        public void Append(object data) => buffer.Append(data);
     }
 }

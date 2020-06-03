@@ -13,11 +13,11 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
+        public override Node Parse()
         {
             var functionParser = MethodCallParsers.DetectWhoCanAccept(expression);
 
-            return functionParser.Parse(queryMapping);
+            return functionParser.Parse();
         }
     }
 }

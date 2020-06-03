@@ -1,4 +1,4 @@
-﻿namespace ExpressionParser.AST.Enum
+﻿namespace ExpressionParser.AST
 {
     public enum Operation
     {

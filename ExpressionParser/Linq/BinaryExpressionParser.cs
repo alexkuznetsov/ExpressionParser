@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+
 using ExpressionParser.AST;
 
 namespace ExpressionParser.Linq
@@ -12,10 +13,10 @@ namespace ExpressionParser.Linq
             this.node = node;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
+        public override Node Parse()
         {
-            var leftNode = GetParser(node.Left).Parse(queryMapping);
-            var rightNode = GetParser(node.Right).Parse(queryMapping);
+            var leftNode = GetParser(node.Left).Parse();
+            var rightNode = GetParser(node.Right).Parse();
 
             return new BinaryNode(ParseOperation(node.NodeType))
             {

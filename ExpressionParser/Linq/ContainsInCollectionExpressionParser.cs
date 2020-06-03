@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 
 using ExpressionParser.AST;
-using ExpressionParser.AST.Enum;
 
 namespace ExpressionParser.Linq
 {
@@ -14,13 +13,13 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
+        public override Node Parse()
         {
             var valuesSet = GetParser(expression.Arguments[0]);
             var memberAccess = GetParser(expression.Arguments[1]);
 
-            var valueSetResult = valuesSet.Parse(queryMapping);
-            var memberAccessResult = memberAccess.Parse(queryMapping);
+            var valueSetResult = valuesSet.Parse();
+            var memberAccessResult = memberAccess.Parse();
 
             return new BinaryNode(Operation.In)
             {
