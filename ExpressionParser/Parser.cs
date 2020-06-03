@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 
 using ExpressionParser.AST;
-using ExpressionParser.AST.Enum;
+using ExpressionParser.Format;
 using ExpressionParser.Linq;
 
 namespace ExpressionParser
@@ -38,15 +38,16 @@ namespace ExpressionParser
             }
         }
 
-        public static NodeExpression CreateResult(Node node)
+        public static NodeExpression CreateResult(Node node, IQueryMapping mapping)
         {
             var finalExpression = new NodeExpression();
-            node.Visit(finalExpression);
+
+            SqlFormatter.GetForNode(node).Format(finalExpression, mapping);
 
             return finalExpression;
         }
 
-        public abstract Node Parse(IQueryMapping queryMapping);
+        public abstract Node Parse();
 
         protected Operation ParseOperation(ExpressionType expressionType)
         {

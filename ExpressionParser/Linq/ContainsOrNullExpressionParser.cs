@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 using System.Linq.Expressions;
 
 using ExpressionParser.AST;
-using ExpressionParser.AST.Enum;
 
 namespace ExpressionParser.Linq
 {
@@ -15,10 +16,10 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
+        public override Node Parse()
         {
-            var arg1 = GetParser(expression.Arguments[0]).Parse(queryMapping);
-            var arg2 = GetParser(expression.Arguments[1]).Parse(queryMapping);
+            var arg1 = GetParser(expression.Arguments[0]).Parse();
+            var arg2 = GetParser(expression.Arguments[1]).Parse();
 
             if (arg1 is ConstantNode cn1 && arg2 is MemberAccessNode man1)
             {
@@ -33,55 +34,46 @@ namespace ExpressionParser.Linq
         }
 
         private Node ParseStringContains(
-              MemberAccessNode memberAccessResult
-            , ConstantNode valueSetResult)
+              MemberAccessNode memberNode
+            , ConstantNode valNode)
         {
-            //var a1 = GetParser(expression.Arguments[0]);
-            //var a2 = GetParser(expression.Arguments[1]);
-
-            //var memberAccessResult = (MemberAccessNode)a1.Parse(queryMapping);
-            //var valueSetResult = (ConstantNode)a2.Parse(queryMapping);
-
-            memberAccessResult.Formatter = (s) => "'%' + " + s + " + '%'";
-            valueSetResult.ForceParameter = true;
+            memberNode.Formatter = (s) => "'%' + " + s + " + '%'";
+            valNode.ForceParameter = true;
 
             return new BinaryNode(Operation.OrElse) /* property like @val or @val is null */
             {
                 LeftNode = new BinaryNode(Operation.Like)
                 {
-                    LeftNode = memberAccessResult,
-                    RightNode = valueSetResult
+                    LeftNode = memberNode,
+                    RightNode = valNode
                 },
                 RightNode = new BinaryNode(Operation.Equal)
                 {
-                    LeftNode = new MemberAccessNode(valueSetResult.ParameterType, $"@{memberAccessResult.MemberName}", memberAccessResult.MemberName),
-                    RightNode = new ConstantNode(valueSetResult.ParameterType, null)
+                    LeftNode = new MemberAccessNode(valNode.ParameterType, $"@{memberNode.MemberName}", memberNode.Parent),
+                    RightNode = new ConstantNode(valNode.ParameterType, null)
                 }
             };
         }
 
         private Node ParseContainsInCollection( 
-              ConstantNode valueSetResult
-            , MemberAccessNode memberAccessResult)
+              ConstantNode valNode
+            , MemberAccessNode memberNode)
         {
-            //var valuesSet = GetParser(expression.Arguments[0]);
-            //var memberAccess = GetParser(expression.Arguments[1]);
-
-            //var valueSetResult = (ConstantNode)valuesSet.Parse(queryMapping);
-            //var memberAccessResult = (MemberAccessNode)memberAccess.Parse(queryMapping);
-
-            return new BinaryNode(Operation.OrElse) /* property in @collection or @collection is null */
+            if ((valNode.Value == null)
+                ||
+                (valNode.Value is IEnumerable e && (e.Cast<object>().Any() == false)))
             {
-                LeftNode = new BinaryNode(Operation.In)
+                return new BinaryNode(Operation.Equal)
                 {
-                    LeftNode = memberAccessResult,
-                    RightNode = valueSetResult
-                },
-                RightNode = new BinaryNode(Operation.Equal)
-                {
-                    LeftNode = new MemberAccessNode(valueSetResult.ParameterType, $"@{memberAccessResult.MemberName}", memberAccessResult.MemberName),
-                    RightNode = new ConstantNode(valueSetResult.ParameterType, null)
-                }
+                    LeftNode = new ConstantNode(valNode.ParameterType, 1),
+                    RightNode = new ConstantNode(valNode.ParameterType, 1)
+                };
+            }
+            
+            return new BinaryNode(Operation.In)
+            {
+                LeftNode = memberNode,
+                RightNode = valNode
             };
         }
     }

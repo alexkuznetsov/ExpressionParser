@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 
 using ExpressionParser.AST;
-using ExpressionParser.AST.Enum;
 
 namespace ExpressionParser.Linq
 {
@@ -14,26 +13,26 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
+        public override Node Parse()
         {
-            var propertyAccess = (MemberAccessNode)GetParser(expression.Arguments[0]).Parse(queryMapping);
+            var memberNode = (MemberAccessNode)GetParser(expression.Arguments[0]).Parse();
 
-            propertyAccess.Formatter = (s) => @$"'%' + {s} + '%'";
+            memberNode.Formatter = (s) => @$"'%' + {s} + '%'";
 
-            var values = (ConstantNode)GetParser(expression.Arguments[1]).Parse(queryMapping);
-            values.ForceParameter = true;
+            var valNode = (ConstantNode)GetParser(expression.Arguments[1]).Parse();
+            valNode.ForceParameter = true;
 
             return new BinaryNode(Operation.OrElse)
             {
                 LeftNode = new BinaryNode(Operation.Like)
                 {
-                    LeftNode = propertyAccess,
-                    RightNode = values
+                    LeftNode = memberNode,
+                    RightNode = valNode
                 },
                 RightNode = new BinaryNode(Operation.Equal)
                 {
-                    LeftNode = new MemberAccessNode(propertyAccess.MemberType, $"@{propertyAccess.MemberName}", propertyAccess.MemberName),
-                    RightNode = new ConstantNode(propertyAccess.MemberType, null)
+                    LeftNode = new MemberAccessNode(memberNode.MemberType, $"@{memberNode.MemberName}", memberNode.Parent),
+                    RightNode = new ConstantNode(memberNode.MemberType, null)
                 }
             };
         }

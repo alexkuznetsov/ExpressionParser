@@ -12,7 +12,7 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
+        public override Node Parse()
         {
             var type = expression.Type;
             return new ConstantNode(type, expression.Value);

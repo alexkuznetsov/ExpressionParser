@@ -15,8 +15,6 @@ namespace ExpressionParser.AST
             ParameterType = type;
             Value = value;
         }
-
-        public override void Visit(NodeExpression finalExpression) => throw new InvalidOperationException();
     }
 
 

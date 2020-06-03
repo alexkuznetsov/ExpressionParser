@@ -13,9 +13,6 @@ namespace ExpressionParser.Linq
             this.expression = expression;
         }
 
-        public override Node Parse(IQueryMapping queryMapping)
-        {
-            return GetParser(expression.Operand).Parse(queryMapping);
-        }
+        public override Node Parse() => GetParser(expression.Operand).Parse();
     }
 }

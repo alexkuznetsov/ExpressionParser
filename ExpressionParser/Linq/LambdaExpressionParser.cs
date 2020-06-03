@@ -10,6 +10,6 @@ namespace ExpressionParser.Linq
 
         public LambdaExpressionParser(LambdaExpression node) => this.node = node;
 
-        public override Node Parse(IQueryMapping queryMapping) => GetParser(node.Body).Parse(queryMapping);
+        public override Node Parse() => GetParser(node.Body).Parse();
     }
 }
