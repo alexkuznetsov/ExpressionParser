@@ -6,13 +6,14 @@
     <IsPackable>true</IsPackable>
 
     <PackageId>ExpressionParser</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Alexandr Kuznetsov (me@akuznetsov.kz)</Authors>
     <Company>Alexandr Kuznetsov</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>LINQ expression to SQL parser</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>LINQ parser SQL netcore</PackageTags>
+    <PackageReleaseNotes>Fix mapping issue when expression is convert node</PackageReleaseNotes>
   </PropertyGroup>
 
   <Import Project="..\BuildTargets\ExpressionParser.MSBuild.targets" />
