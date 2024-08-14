@@ -4,46 +4,43 @@ using System.Linq.Expressions;
 
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Linq
+namespace ExpressionParser.Linq;
+
+internal class DefaultMethodCallExpressionParser : Parser
 {
-    internal class DefaultMethodCallExpressionParser : Parser
+    private static readonly Dictionary<string, SqlOperationFormatter> SqlOperationMap = new()
     {
-        private readonly Dictionary<string, SqlOperationFormatter> sqlOperationMap = new Dictionary<string, SqlOperationFormatter>
-        {
-            {"StartsWith", new SqlOperationFormatter(Operation.Like, (s) =>s + " + '%'")},
-            {"Contains",    new SqlOperationFormatter(Operation.Like, (s) =>"'%' + " + s + " + '%'")},
-            {"EndsWith",    new SqlOperationFormatter(Operation.Like, (s) =>"'%' + " + s)},
-        };
+        {"StartsWith", new SqlOperationFormatter(Operation.Like, (s) =>s + " + '%'")},
+        {"Contains",    new SqlOperationFormatter(Operation.Like, (s) =>"'%' + " + s + " + '%'")},
+        {"EndsWith",    new SqlOperationFormatter(Operation.Like, (s) =>"'%' + " + s)},
+    };
 
-        private class SqlOperationFormatter
+    private class SqlOperationFormatter
+    {
+        public SqlOperationFormatter(Operation operation, Func<string, string> formatter)
         {
-            public SqlOperationFormatter(Operation operation, Func<string, string> formatter)
-            {
-                Operation = operation;
-                Formatter = formatter;
-            }
-
-            public Operation Operation { get; }
-            public Func<string, string> Formatter { get; }
+            Operation = operation;
+            Formatter = formatter;
         }
 
-        private readonly MethodCallExpression expression;
+        public Operation Operation { get; }
+        public Func<string, string> Formatter { get; }
+    }
 
-        public DefaultMethodCallExpressionParser(MethodCallExpression expression)
-        {
-            this.expression = expression;
-        }
+    private readonly MethodCallExpression expression;
 
-        public override Node Parse()
-        {
-            var testObject = expression.Object as MemberExpression;
+    public DefaultMethodCallExpressionParser(MethodCallExpression expression)
+    {
+        this.expression = expression;
+    }
 
-            if (!sqlOperationMap.TryGetValue(expression.Method.Name, out var formatter))
-            {
-                throw new NotSupportedException($"Method {expression.Method} not supported");
-            }
+    public override Node Parse()
+    {
+        var testObject = expression.Object as MemberExpression;
 
-            return new BinaryNode(formatter.Operation)
+        return !SqlOperationMap.TryGetValue(expression.Method.Name, out var formatter)
+            ? throw new NotSupportedException($"Method {expression.Method} not supported")
+            : (Node)new BinaryNode(formatter.Operation)
             {
                 LeftNode = new MethodCallNode
                 {
@@ -53,6 +50,5 @@ namespace ExpressionParser.Linq
 
                 RightNode = GetParser(expression.Arguments[0]).Parse()
             };
-        }
     }
 }

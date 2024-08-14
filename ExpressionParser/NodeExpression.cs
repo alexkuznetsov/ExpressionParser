@@ -2,27 +2,42 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace ExpressionParser
+namespace ExpressionParser;
+
+public class NodeExpression
 {
-    public class NodeExpression
+    private readonly StringBuilder _buffer = new();
+
+    public List<NodeParameter> Parameters { get; } = [];
+
+    public string ResultExpression
     {
-        private readonly StringBuilder buffer = new StringBuilder();
-
-        public List<NodeParameter> Parameters { get; } = new List<NodeParameter>();
-
-        public string ResultExpression
+        get
         {
-            get
-            {
-                return buffer.ToString();
-            }
+            return _buffer.ToString();
         }
-
-        [DebuggerStepThrough]
-        public void Append(char data) => buffer.Append(data);
-        [DebuggerStepThrough]
-        public void Append(string data) => buffer.Append(data);
-        [DebuggerStepThrough]
-        public void Append(object data) => buffer.Append(data);
     }
+
+    public string ResultExpressionWithoutNamedParameters
+    {
+        get
+        {
+            var buff = new StringBuilder();
+            buff.Append(_buffer);
+
+            foreach (var o in Parameters)
+            {
+                buff.Replace($"@{o.Name}", "?");
+            }
+
+            return buff.ToString();
+        }
+    }
+
+    [DebuggerStepThrough]
+    public void Append(char data) => _buffer.Append(data);
+    [DebuggerStepThrough]
+    public void Append(string data) => _buffer.Append(data);
+    [DebuggerStepThrough]
+    public void Append(object data) => _buffer.Append(data);
 }

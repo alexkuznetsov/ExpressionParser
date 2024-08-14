@@ -2,17 +2,16 @@
 
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Linq
+namespace ExpressionParser.Linq;
+
+internal class UnaryExpressionParser : Parser
 {
-    internal class UnaryExpressionParser : Parser
+    private readonly UnaryExpression _expression;
+
+    public UnaryExpressionParser(UnaryExpression expression)
     {
-        private readonly UnaryExpression expression;
-
-        public UnaryExpressionParser(UnaryExpression expression)
-        {
-            this.expression = expression;
-        }
-
-        public override Node Parse() => GetParser(expression.Operand).Parse();
+        this._expression = expression;
     }
+
+    public override Node Parse() => GetParser(_expression.Operand).Parse();
 }

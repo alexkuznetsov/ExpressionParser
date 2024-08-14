@@ -2,27 +2,26 @@
 
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Linq
+namespace ExpressionParser.Linq;
+
+internal class BinaryExpressionParser : Parser
 {
-    internal class BinaryExpressionParser : Parser
+    private readonly BinaryExpression _node;
+
+    public BinaryExpressionParser(BinaryExpression node)
     {
-        private readonly BinaryExpression node;
+        this._node = node;
+    }
 
-        public BinaryExpressionParser(BinaryExpression node)
+    public override Node Parse()
+    {
+        var leftNode = GetParser(_node.Left).Parse();
+        var rightNode = GetParser(_node.Right).Parse();
+
+        return new BinaryNode(ParseOperation(_node.NodeType))
         {
-            this.node = node;
-        }
-
-        public override Node Parse()
-        {
-            var leftNode = GetParser(node.Left).Parse();
-            var rightNode = GetParser(node.Right).Parse();
-
-            return new BinaryNode(ParseOperation(node.NodeType))
-            {
-                LeftNode = leftNode,
-                RightNode = rightNode
-            };
-        }
+            LeftNode = leftNode,
+            RightNode = rightNode
+        };
     }
 }

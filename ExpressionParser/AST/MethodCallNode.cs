@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace ExpressionParser.AST
+namespace ExpressionParser.AST;
+
+public class MethodCallNode : Node
 {
-    public class MethodCallNode : Node
-    {
-        public string MemberName { get; internal set; }
-        public Func<string, string> Formatter { get; internal set; }
-    }
+    public string MemberName { get; internal set; }
+    public Func<string, string> Formatter { get; internal set; }
 }

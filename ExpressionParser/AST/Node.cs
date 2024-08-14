@@ -1,7 +1,6 @@
-﻿namespace ExpressionParser.AST
-{
-    public abstract class Node
-    {
+﻿namespace ExpressionParser.AST;
 
-    }
+public abstract class Node
+{
+
 }

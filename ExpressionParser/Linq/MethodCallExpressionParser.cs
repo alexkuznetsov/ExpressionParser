@@ -2,22 +2,21 @@
 
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Linq
+namespace ExpressionParser.Linq;
+
+internal class MethodCallExpressionParser : Parser
 {
-    internal class MethodCallExpressionParser : Parser
+    private readonly MethodCallExpression _expression;
+
+    public MethodCallExpressionParser(MethodCallExpression expression)
     {
-        private readonly MethodCallExpression expression;
+        this._expression = expression;
+    }
 
-        public MethodCallExpressionParser(MethodCallExpression expression)
-        {
-            this.expression = expression;
-        }
+    public override Node Parse()
+    {
+        var functionParser = MethodCallParsers.DetectWhoCanAccept(_expression);
 
-        public override Node Parse()
-        {
-            var functionParser = MethodCallParsers.DetectWhoCanAccept(expression);
-
-            return functionParser.Parse();
-        }
+        return functionParser.Parse();
     }
 }

@@ -2,47 +2,46 @@
 
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Format
+namespace ExpressionParser.Format;
+
+internal class MethodCallFormatter : SqlFormatter
 {
-    internal class MethodCallFormatter : SqlFormatter
+    private readonly BinaryNode _binary;
+
+    public MethodCallFormatter(BinaryNode binary)
     {
-        private readonly BinaryNode binary;
+        this._binary = binary;
+    }
 
-        public MethodCallFormatter(BinaryNode binary)
+    public override void Format(NodeExpression finalExpression, IQueryMapping mapping)
+    {
+        MethodCallNode methodCallNode = (MethodCallNode)_binary.LeftNode;
+        ConstantNode methodCallArg = (ConstantNode)_binary.RightNode;
+
+        if (!mapping.Mappings.TryGetValue(methodCallNode.MemberName, out var identifier))
         {
-            this.binary = binary;
+            identifier = methodCallNode.MemberName;
         }
 
-        public override void Format(NodeExpression finalExpression, IQueryMapping mapping)
+        finalExpression.Append('(');
+        finalExpression.Append(identifier);
+
+        finalExpression.Append(' ');
+        finalExpression.Append(OperationAsString(_binary.Operation));
+        finalExpression.Append(' ');
+
+        var parameterName = methodCallNode.MemberName.Replace(".", "");
+        var type = methodCallArg.ParameterType;
+
+
+        if (type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type)))
         {
-            MethodCallNode methodCallNode = (MethodCallNode)binary.LeftNode;
-            ConstantNode methodCallArg = (ConstantNode)binary.RightNode;
-
-            if (!mapping.Mappings.TryGetValue(methodCallNode.MemberName, out var identifier))
-            {
-                identifier = methodCallNode.MemberName;
-            }
-
-            finalExpression.Append('(');
-            finalExpression.Append(identifier);
-
-            finalExpression.Append(' ');
-            finalExpression.Append(OperationAsString(binary.Operation));
-            finalExpression.Append(' ');
-
-            var parameterName = methodCallNode.MemberName.Replace(".", "");
-            var type = methodCallArg.ParameterType;
-
-
-            if (type != typeof(string) && (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type)))
-            {
-                parameterName += "Collection";
-            }
-
-            finalExpression.Append(methodCallNode.Formatter($"@{parameterName}"));
-
-            finalExpression.Parameters.Add(new NodeParameter(parameterName, methodCallArg.Value));
-            finalExpression.Append(')');
+            parameterName += "Collection";
         }
+
+        finalExpression.Append(methodCallNode.Formatter($"@{parameterName}"));
+
+        finalExpression.Parameters.Add(new NodeParameter(parameterName, methodCallArg.Value));
+        finalExpression.Append(')');
     }
 }

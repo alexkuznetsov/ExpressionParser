@@ -2,14 +2,13 @@
 
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Linq
+namespace ExpressionParser.Linq;
+
+internal class LambdaExpressionParser : Parser
 {
-    internal class LambdaExpressionParser : Parser
-    {
-        private readonly LambdaExpression node;
+    private readonly LambdaExpression _node;
 
-        public LambdaExpressionParser(LambdaExpression node) => this.node = node;
+    public LambdaExpressionParser(LambdaExpression node) => this._node = node;
 
-        public override Node Parse() => GetParser(node.Body).Parse();
-    }
+    public override Node Parse() => GetParser(_node.Body).Parse();
 }

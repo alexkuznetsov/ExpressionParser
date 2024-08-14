@@ -1,21 +1,20 @@
 ﻿using System.Linq.Expressions;
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Linq
+namespace ExpressionParser.Linq;
+
+internal class ConstantExpressionParser : Parser
 {
-    internal class ConstantExpressionParser : Parser
+    private readonly ConstantExpression _expression;
+
+    public ConstantExpressionParser(ConstantExpression expression)
     {
-        private readonly ConstantExpression expression;
+        this._expression = expression;
+    }
 
-        public ConstantExpressionParser(ConstantExpression expression)
-        {
-            this.expression = expression;
-        }
-
-        public override Node Parse()
-        {
-            var type = expression.Type;
-            return new ConstantNode(type, expression.Value);
-        }
+    public override Node Parse()
+    {
+        var type = _expression.Type;
+        return new ConstantNode(type, _expression.Value);
     }
 }

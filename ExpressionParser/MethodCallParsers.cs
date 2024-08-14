@@ -5,64 +5,60 @@ using System.Linq.Expressions;
 
 using ExpressionParser.Linq;
 
-namespace ExpressionParser
+namespace ExpressionParser;
+
+internal static class MethodCallParsers
 {
-    internal static class MethodCallParsers
+    class Test
     {
-        class Test
+        public Test(Func<MethodCallExpression, bool> canAccept, Func<MethodCallExpression, Parser> builder)
         {
-            public Test(Func<MethodCallExpression, bool> canAccept, Func<MethodCallExpression, Parser> builder)
-            {
-                CanAccept = canAccept;
-                Builder = builder;
-            }
-
-            public Func<MethodCallExpression, bool> CanAccept { get; }
-            public Func<MethodCallExpression, Parser> Builder { get; }
+            CanAccept = canAccept;
+            Builder = builder;
         }
 
-        private static readonly List<Test> mappingList = new List<Test>();
+        public Func<MethodCallExpression, bool> CanAccept { get; }
+        public Func<MethodCallExpression, Parser> Builder { get; }
+    }
 
-        private static IReadOnlyCollection<Test> Mapping => mappingList;
+    private static readonly List<Test> MappingList = [];
 
-        private static readonly object mappingLock = new object();
+    private static IReadOnlyCollection<Test> Mapping => MappingList;
 
-        public static void AddMapping(Func<MethodCallExpression, bool> canAcceptTest, Func<MethodCallExpression, Parser> factory)
+    private static readonly object MappingLock = new();
+
+    public static void AddMapping(Func<MethodCallExpression, bool> canAcceptTest, Func<MethodCallExpression, Parser> factory)
+    {
+        lock (MappingLock)
         {
-            lock (mappingLock)
-            {
-                mappingList.Add(new Test(canAcceptTest, factory));
-            }
+            MappingList.Add(new Test(canAcceptTest, factory));
         }
+    }
 
-        static MethodCallParsers()
-        {
-            AddMapping((e) => e.Arguments.Count == 1,
-                       (e) => new DefaultMethodCallExpressionParser(e));
+    static MethodCallParsers()
+    {
+        AddMapping((e) => e.Arguments.Count == 1,
+                   (e) => new DefaultMethodCallExpressionParser(e));
 
-            AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "Contains",
-                       (e) => new ContainsInCollectionExpressionParser(e));
+        AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "Contains",
+                   (e) => new ContainsInCollectionExpressionParser(e));
 
-            AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "ContainsOrNull",
-                       (e) => new ContainsOrNullExpressionParser(e));
+        AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "ContainsOrNull",
+                   (e) => new ContainsOrNullExpressionParser(e));
 
-            AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "LikeOrNull",
-                       (e) => new LikeOrNullExpressionParser(e));
+        AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "LikeOrNull",
+                   (e) => new LikeOrNullExpressionParser(e));
 
-            AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "EqualsOrNull",
-                       (e) => new EqualsOrNullExpressionParser(e));
-        }
+        AddMapping((e) => e.Arguments.Count == 2 && e.Method.Name == "EqualsOrNull",
+                   (e) => new EqualsOrNullExpressionParser(e));
+    }
 
-        public static Parser DetectWhoCanAccept(MethodCallExpression expression)
-        {
-            var parserTest = Mapping.FirstOrDefault(x => x.CanAccept(expression));
+    public static Parser DetectWhoCanAccept(MethodCallExpression expression)
+    {
+        var parserTest = Mapping.FirstOrDefault(x => x.CanAccept(expression));
 
-            if (parserTest != null)
-            {
-                return parserTest.Builder(expression);
-            }
-
-            throw new NotSupportedException($"Method {expression.Method} supported only one argument, constant");
-        }
+        return parserTest != null
+            ? parserTest.Builder(expression)
+            : throw new NotSupportedException($"Method {expression.Method} supported only one argument, constant");
     }
 }

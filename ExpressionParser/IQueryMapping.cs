@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace ExpressionParser
+namespace ExpressionParser;
+
+public interface IQueryMapping
 {
-    public interface IQueryMapping
-    {
-        IReadOnlyDictionary<string, string> Mappings { get; }
-    }
+    IReadOnlyDictionary<string, string> Mappings { get; }
 }

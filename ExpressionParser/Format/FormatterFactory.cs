@@ -2,11 +2,10 @@
 
 using ExpressionParser.AST;
 
-namespace ExpressionParser.Format
+namespace ExpressionParser.Format;
+
+internal class FormatterFactory
 {
-    internal class FormatterFactory
-    {
-        public Func<Node, bool> CanAccept { get; set; }
-        public Func<Node, SqlFormatter> Builder { get; set; }
-    }
+    public Func<Node, bool> CanAccept { get; set; }
+    public Func<Node, SqlFormatter> Builder { get; set; }
 }

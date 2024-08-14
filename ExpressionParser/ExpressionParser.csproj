@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 
     <IsPackable>true</IsPackable>
 
     <PackageId>ExpressionParser</PackageId>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>Alexandr Kuznetsov (me@akuznetsov.kz)</Authors>
     <Company>Alexandr Kuznetsov</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
