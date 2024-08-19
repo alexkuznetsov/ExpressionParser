@@ -7,37 +7,40 @@ using Domain;
 using Infrastructure;
 
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace ExpressionParser.Tests;
 
 public class ExpressionParseTests
 {
-    private IQueryMapping mapping;
+    private TestModelMapping _mapping;
 
     [SetUp]
     public void Setup()
     {
-        mapping = new TestModelMapping();
+        _mapping = new TestModelMapping();
     }
 
     [Test]
+    public void GivenTestModelMapping_TableAliasMappingAreCorrect()
+    {
+        Assert.That(_mapping.TableAlias, Is.EqualTo("m"));
+        Assert.That(_mapping.Mappings, Contains.Key("SubModel.Name"));
+        Assert.That(_mapping.Mappings["SubModel.Name"], Is.EqualTo("s.name"));
+    }
+
+        [Test]
     public void GivenParentIdWithCodeWithName_ResultWithDefaultParentesis()
     {
         Expression<Func<TestModel, bool>> expression = s => s.ParentId == 1 && s.Code == "CODEXX1" || s.Name == "zzz";
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That("(((m.parent_id = @ParentId) AND (m.code = @Code)) OR (m.name = @Name))", Is.EqualTo(result.ResultExpression));
 
         var parametes = result.Parameters.ToDictionary(x => x.Name, x => x.Value);
 
         Assert.That(parametes.Count, Is.EqualTo(3));
-
-        //Assert.That(parametes.ContainsKey("ParentId"));
-        //Assert.That(parametes.ContainsKey("Code"));
-        //Assert.That(parametes.ContainsKey("Name"));
 
         Assert.That(parametes, Contains.Key("ParentId"));
         Assert.That(parametes, Contains.Key("Code"));
@@ -54,7 +57,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.ParentId == 1 && (s.Code == "CODEXX1" || s.Name == "zzz");
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"((m.parent_id = @ParentId) AND ((m.code = @Code) OR (m.name = @Name)))", Is.EqualTo(result.ResultExpression));
 
@@ -77,7 +80,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.Code != "CODEXX1";
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(m.code != @Code)", Is.EqualTo(result.ResultExpression));
 
@@ -96,7 +99,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.ParentId != null;
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(m.parent_id IS NOT NULL)", Is.EqualTo(result.ResultExpression));
 
@@ -110,7 +113,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.ParentId != null && s.Id > 10;
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"((m.parent_id IS NOT NULL) AND (m.id > @Id))", Is.EqualTo(result.ResultExpression));
 
@@ -132,7 +135,7 @@ public class ExpressionParseTests
             s.ParentCode.EndsWith("hell");
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(((m.parent_id IS NOT NULL) AND (m.id >= @Id)) AND (m.parent_code LIKE '%' + @ParentCode))", Is.EqualTo(result.ResultExpression));
 
@@ -153,7 +156,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => idCollection.Contains(s.Id);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(m.id IN @IdCollection)", Is.EqualTo(result.ResultExpression));
 
@@ -173,7 +176,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.Name.LikeOrNull(optionalName) && s.Id.EqualsOrNull(idVal);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL)) AND ((m.id = @Id) OR (@Id IS NULL)))", Is.EqualTo(result.ResultExpression));
 
@@ -194,7 +197,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => idCollection.ContainsOrNull(s.Id);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(m.id IN @IdCollection)", Is.EqualTo(result.ResultExpression));
 
@@ -213,7 +216,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => idCollection.ContainsOrNull(s.Id);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(1 = 1)", Is.EqualTo(result.ResultExpression));
 
@@ -229,7 +232,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => idCollection.ContainsOrNull(s.Id);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(1 = 1)", Is.EqualTo(result.ResultExpression));
 
@@ -245,7 +248,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.Name.Contains(name);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"(m.name LIKE '%' + @Name + '%')", Is.EqualTo(result.ResultExpression));
 
@@ -264,7 +267,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.Name.ContainsOrNull(name);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         Assert.That(@"((m.name LIKE '%' + @Name + '%') OR (@Name IS NULL))", Is.EqualTo(result.ResultExpression));
 
@@ -283,7 +286,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.SubModel.Name.ContainsOrNull(name);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         //SubModel.Name => s.name
 
@@ -304,7 +307,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.Name.ContainsOrNull(name) || s.SubModel.Name.ContainsOrNull(name);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         //SubModel.Name => s.name
 
@@ -327,7 +330,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.Name.ContainsOrNull("это для те");
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         //SubModel.Name => s.name
 
@@ -349,7 +352,7 @@ public class ExpressionParseTests
         Expression<Func<TestModel, bool>> expression = s => s.Name.StartsWith(name);
         var parser = Parser.GetParser(expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         //SubModel.Name => s.name
 
@@ -371,7 +374,7 @@ public class ExpressionParseTests
         var spec = new GetTestModelSpecification(query, idCollection);
         var parser = Parser.GetParser(spec.Expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         //SubModel.Name => s.name
 
@@ -397,7 +400,7 @@ public class ExpressionParseTests
         var spec = new GetTestModelSpecification(query, idCollection);
         var parser = Parser.GetParser(spec.Expression);
         var node = parser.Parse();
-        var result = Parser.CreateResult(node, mapping);
+        var result = Parser.CreateResult(node, _mapping);
 
         //SubModel.Name => s.name
 

@@ -33,7 +33,7 @@ internal class ContainsOrNullExpressionParser : Parser
         throw new NotSupportedException($"ContainsOrNullExpressionParser: {_expression} not supported");
     }
 
-    private Node ParseStringContains(
+    private static BinaryNode ParseStringContains(
           MemberAccessNode memberNode
         , ConstantNode valNode)
     {
@@ -55,7 +55,7 @@ internal class ContainsOrNullExpressionParser : Parser
         };
     }
 
-    private Node ParseContainsInCollection( 
+    private static BinaryNode ParseContainsInCollection(
           ConstantNode valNode
         , MemberAccessNode memberNode)
     {

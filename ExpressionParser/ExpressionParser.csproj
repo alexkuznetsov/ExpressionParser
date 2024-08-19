@@ -6,7 +6,7 @@
     <IsPackable>true</IsPackable>
 
     <PackageId>ExpressionParser</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>Alexandr Kuznetsov (me@akuznetsov.kz)</Authors>
     <Company>Alexandr Kuznetsov</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -16,10 +16,8 @@
     <PackageReleaseNotes>Fix mapping issue when expression is convert node</PackageReleaseNotes>
   </PropertyGroup>
 
-  <Import Project="..\BuildTargets\ExpressionParser.MSBuild.targets" />
-
-  <Target Name="CopyPackage" AfterTargets="Pack">
+  <!--<Target Name="CopyPackage" AfterTargets="Pack">
     <Copy SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(SolutionDir)..\..\..\source\nupkg\" />
-  </Target>
+  </Target>-->
 
 </Project>
