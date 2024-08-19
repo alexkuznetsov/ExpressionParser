@@ -347,3 +347,4 @@ healthchecksdb
 Support/SwaggerCodeGen/generated/
 
 tests/DM.Backend.IntegrationTests/create_db.sql
+/nuget.config
