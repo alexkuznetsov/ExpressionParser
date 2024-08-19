@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionParser", "ExpressionParser\ExpressionParser.csproj", "{BBBC9610-CE67-454A-9D1A-7EC1852AEA17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionParser", "src\ExpressionParser\ExpressionParser.csproj", "{BBBC9610-CE67-454A-9D1A-7EC1852AEA17}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionParser.Tests", "ExpressionParser.Tests\ExpressionParser.Tests.csproj", "{12AC43B3-EA98-4324-B746-FF84F529375F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionParser.Tests", "src\ExpressionParser.Tests\ExpressionParser.Tests.csproj", "{12AC43B3-EA98-4324-B746-FF84F529375F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

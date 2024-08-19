@@ -1,0 +1,20 @@
+<Project DefaultTargets="Build"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Product>ExpressionParser</Product>
+    <Version>1.0.5</Version>
+    <Authors>Alexander Kuznetsov</Authors>
+    <Copyright>Copyright $([System.DateTime]::Now.ToString(`yyyy`)) &#169; me@akuznetsov.kz</Copyright>
+    <RepositoryUrl>https://github.com/alexkuznetsov/ExpressionParser.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://akuznetsov.kz/posts/expression-parser-lib/</PackageProjectUrl>
+    <Description>Parse LINQ Expressionns to the SQL expression regarding query mapping</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup Label="PackageIcon">
+    <None Include="$(MSBuildThisFileDirectory)Assets\Icon.png" Pack="true" Visible="true" PackagePath=""/>
+  </ItemGroup>
+</Project>

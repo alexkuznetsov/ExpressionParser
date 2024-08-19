@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+      <PackageOutputPath Condition="'$(PackageOutputPath)' == ''">$(MSBuildThisFileDirectory)build-intermediate\nuget</PackageOutputPath>
+      <!-- https://github.com/dotnet/msbuild/issues/2661 -->
+      <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
+      <MSBuildEnableWorkloadResolver>false</MSBuildEnableWorkloadResolver>
+      <RunApiCompat>False</RunApiCompat>
+      <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+</Project>

@@ -10,16 +10,25 @@ using NUnit.Framework;
 
 namespace ExpressionParser.Tests;
 
+/// <summary>
+/// tests
+/// </summary>
 public class ExpressionParseTests
 {
     private TestModelMapping _mapping;
 
+    /// <summary>
+    /// Arrange
+    /// </summary>
     [SetUp]
     public void Setup()
     {
         _mapping = new TestModelMapping();
     }
 
+    /// <summary>
+    /// Test for configuration
+    /// </summary>
     [Test]
     public void GivenTestModelMapping_TableAliasMappingAreCorrect()
     {
@@ -28,7 +37,10 @@ public class ExpressionParseTests
         Assert.That(_mapping.Mappings["SubModel.Name"], Is.EqualTo("s.name"));
     }
 
-        [Test]
+    /// <summary>
+    /// Given expression with ParentIs and Code and name and default parentesis
+    /// </summary>
+    [Test]
     public void GivenParentIdWithCodeWithName_ResultWithDefaultParentesis()
     {
         Expression<Func<TestModel, bool>> expression = s => s.ParentId == 1 && s.Code == "CODEXX1" || s.Name == "zzz";
