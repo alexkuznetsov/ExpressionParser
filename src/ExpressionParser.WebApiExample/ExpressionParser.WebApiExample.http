@@ -1,0 +1,6 @@
+@ExpressionParser.WebApiExample_HostAddress = http://localhost:5078
+
+GET {{ExpressionParser.WebApiExample_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
